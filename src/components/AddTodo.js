@@ -1,7 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { connect } from 'react-redux';
 
-import { addTodo } from '../actions';
+import { addTodo } from '../store/actionCreators';
 import ErrorMessage from './ErrorMessage';
 
 const AddTodo = ({ addTodo }) => {

@@ -8,3 +8,5 @@ interface TodoAction {
   type: string;
   payload: Todo
 }
+
+type DispatchType = (args: TodoAction) => TodoAction
