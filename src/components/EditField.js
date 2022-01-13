@@ -1,78 +1,73 @@
-import React, { createRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCheckCircle, faTimesCircle } from '@fortawesome/free-regular-svg-icons';
 
 import ErrorMessage from './ErrorMessage';
 
-class EditField extends React.Component {
+const EditField = ({ id, value, hideEdit, updateTodo }) => {
+    const [editValue, setEditValue] = useState(value);
+    const [isEmptyField, setIsEmptyField] = useState(false);
 
-    constructor(props){
-        super(props);
-        this.state = { 
-            editValue: this.props.value,
-            isEmptyField: false
-        };
-
-        this.editField = createRef();
-        this.editBlock = createRef();
-    }
-
-    componentDidMount() {
-        this.editField.current.focus();
-
-        this.editField.current.onkeydown = e => {
-            if(e.code === 'Enter') this.confirm();
-            else if(e.code === 'Escape') this.props.hideEdit();
-        }
-    }
-
-    onEditFieldChange = e => {
-        this.setState({ editValue: e.target.value })
-    }
-
-    confirm = () => {
-        if(this.state.editValue === '') {
-            this.setEmpty(true);
-            this.editField.current.focus();
-        } else {
-            this.props.hideEdit();
-            this.props.updateTodo(this.props.id, this.state.editValue);
-        }
-    }
-
-    showError(status){
+    const editField = useRef(null);
+    const editBlock = useRef(null);
+  
+    useEffect(() => {
+        editField.current.focus();
+    }, []);
+    
+    const onInputKeyDown = e => {
+        if(e.key === 'Enter') confirm();
+        else if(e.key === 'Escape') cancel();
+    };
+    
+    const onEditFieldChange = e => {
+        setEditValue( e.target.value );
+    };
+    
+    const showError = (status) => {
         return status ? <ErrorMessage message="Please, type something or hit escape!"/> : null;
-    }
+    };
+    
+    const confirm = () => {
+        if(editValue === '') {
+            setIsEmptyField(true);
+            editField.current.focus();
+        } else {
+            setIsEmptyField(false);
+            hideEdit();
+            updateTodo(id, editValue);
+        }
+    };
 
-    setEmpty = flag => {
-        this.setState({ isEmptyField: flag })
+    const cancel = () => {
+        setIsEmptyField(false);
+        hideEdit();
     }
-
-    render() {
-        return (
-            <div className="edit-container" ref={this.editBlock}>
-                <div className="edit-container__inner">
-                    <input 
-                        className="list__item-text edit-field" 
-                        value={ this.state.editValue } 
-                        ref={ this.editField }
-                        onChange={this.onEditFieldChange}
-                    />
-                    <div className="edit-field__toolbar">
-                        <button className="btn btn-confirm" onClick={this.confirm}>
-                            <FontAwesomeIcon icon={faCheckCircle}/>
-                        </button>
-                        <button className="btn btn-cancel" onClick={this.props.hideEdit}>
-                            <FontAwesomeIcon icon={faTimesCircle}/>
-                        </button>
-                    </div>
-                </div>
-                <div className="error-message error-message-2">
-                    { this.showError(this.state.isEmptyField) }
+    
+    return (
+        <div className="edit-container" ref={editBlock}>
+            <div className="edit-container__inner">
+                <input 
+                    className="list__item-text edit-field" 
+                    value={ editValue } 
+                    ref={ editField }
+                    onChange={ onEditFieldChange }
+                    onKeyDown={ onInputKeyDown }
+                />
+                <div className="edit-field__toolbar">
+                    <button className="btn btn-confirm" onClick={ confirm }>
+                        <FontAwesomeIcon icon={ faCheckCircle }/>
+                    </button>
+                    <button className="btn btn-cancel" onClick={ cancel }>
+                        <FontAwesomeIcon icon={ faTimesCircle }/>
+                    </button>
                 </div>
             </div>
-        );
-    }
+            <div className="error-message error-message-2">
+                { showError(isEmptyField) }
+            </div>
+        </div>
+    );
 }
 
 export default EditField;

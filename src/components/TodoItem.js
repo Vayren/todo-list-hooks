@@ -1,67 +1,62 @@
-import React, { createRef } from 'react';
+import React, { useState, useRef } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCheckCircle, faTrashAlt } from '@fortawesome/free-regular-svg-icons';
 import { faPencilAlt } from '@fortawesome/free-solid-svg-icons';
 
+import { connect } from 'react-redux';
+import { deleteTodo, updateTodo, toggleTodo } from '../actions';
 import EditField from './EditField';
 
-class TodoItem extends React.Component {
+const TodoItem = ({ itemId, checked, title, deleteTodo, updateTodo, toggleTodo }) => {
+    const [isEdit, setIsEdit] = useState(false);
+
+    const titleRef = useRef(null);
     
-    constructor(props){
-        super(props);
-        this.state = { isEdit: false };
-        this.titleRef = createRef();
+    const showEdit = () => {
+        setIsEdit(true);
+    }
+    
+    const hideEdit = () => {
+        setIsEdit(false);
     }
 
-    showEdit = () => {
-        this.setState({ isEdit: true });
-    }
-
-    hideEdit = () => {
-        this.setState({ isEdit: false })
-    }
-
-    render() {
-
-        const { itemId, checked, title, toggleTodo, deleteTodo, updateTodo } = this.props;
-
-        return (
-            <div className="list__item" key={itemId}>
-                
-                <div className="list__item-title">
-                    <label 
-                        className={`btn btn-checked ${checked ? '' : 'checked'}`}
-                        htmlFor="check"
-                        onClick={() => toggleTodo(itemId)}
+    return (
+        <div className="list__item" key={itemId}>
+            
+            <div className="list__item-title">
+                <label 
+                    className={`btn btn-checked ${checked ? '' : 'checked'}`}
+                    htmlFor="check"
+                    onClick={() => toggleTodo(itemId)}
+                >
+                    <FontAwesomeIcon icon={faCheckCircle} /> 
+                </label>
+                <input type="checkbox" id="check" className="list__input-checkbox"/>
+        
+                {isEdit ? 
+                    <EditField value={title} id={itemId} updateTodo={updateTodo} hideEdit={ hideEdit }/> :
+    
+                    <span className={`list__item-text ${checked ? '' : 'line-through'} ${ isEdit ? 'unvisible' : '' }` } 
+                        ref={ titleRef }
                     >
-                        <FontAwesomeIcon icon={faCheckCircle} /> 
-                    </label>
-                    <input type="checkbox" id="check" className="list__input-checkbox"/>
-
-                    {this.state.isEdit ? 
-                        <EditField value={title} id={itemId} updateTodo={updateTodo} hideEdit={this.hideEdit}/> :
-
-                        <span className={`list__item-text ${checked ? '' : 'line-through'} ${this.state.isEdit ? 'unvisible' : '' }` } 
-                            ref={this.titleRef}
-                        >
-                            {title}
-                        </span> 
-                    }
-                </div>
-
-                <div className="list__item-toolbar">
-                    <button className={`btn btn-edit ${this.state.isEdit ? 'unvisible' : '' }`} onClick={ this.showEdit }>
-                        <FontAwesomeIcon icon={faPencilAlt} />
-                    </button>
-                    <button className="btn btn-delete" onClick={() => deleteTodo(itemId)}>
-                        <FontAwesomeIcon icon={faTrashAlt} />    
-                    </button>
-                </div>
+                        {title}
+                    </span> 
+                }
 
             </div>
-        );
-    }
+    
+            <div className="list__item-toolbar">
+                <button className={`btn btn-edit ${ isEdit ? 'unvisible' : '' }`} onClick={ showEdit }>
+                    <FontAwesomeIcon icon={faPencilAlt} />
+                </button>
+                <button className="btn btn-delete" onClick={() => deleteTodo(itemId)}>
+                    <FontAwesomeIcon icon={faTrashAlt} />    
+                </button>
+            </div>
+    
+        </div>
+    );
 
 }
 
-export default TodoItem;
+export default connect(null, { deleteTodo, updateTodo, toggleTodo })(TodoItem);

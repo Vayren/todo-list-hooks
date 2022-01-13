@@ -1,10 +1,8 @@
 import React from 'react';
 
 import TodoItem from './TodoItem';
-//<textarea rows="1">{item.title}</textarea>  
-//<span className={`list__item-text ${item.status ? '' : 'line-through'}`} >{item.title}</span> 
 
-const TodoList = ({ todoList, deleteTodo, toggleTodo, updateTodo }) => {
+const TodoList = ({ todoList }) => {
 
     const renderList = list => {
         return list.map( item => {
@@ -12,9 +10,6 @@ const TodoList = ({ todoList, deleteTodo, toggleTodo, updateTodo }) => {
             < TodoItem 
                 itemId={item.id} 
                 checked={item.status} 
-                toggleTodo={toggleTodo} 
-                deleteTodo={deleteTodo} 
-                updateTodo={updateTodo}
                 title={item.title} 
                 key={item.id}
             />
